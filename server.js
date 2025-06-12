@@ -5,31 +5,31 @@ const bodyParser = require('body-parser');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Разрешаем запросы с любых источников
+// CORS для любых источников
 app.use(cors());
 
-// Парсим JSON и формы
+// Разбираем тело запроса
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// POST маршрут
 app.post('/submit', (req, res) => {
   const { username, password } = req.body;
-
   if (!username || !password) {
-    return res.status(400).json({ error: 'Имя и пароль обязательны.' });
+    return res.status(400).send('Ошибка: имя и пароль обязательны.');
   }
 
-  console.log('Получено:', username, password); // для проверки
-
-  res.json({
-    message: 'Данные успешно получены!',
-    user: sanitize(username),
-    pass: sanitize(password)
-  });
+  res.send(`
+    <html>
+      <head><title>Данные</title></head>
+      <body style="font-family:sans-serif;text-align:center;padding:40px;">
+        <h1>Информация получена!</h1>
+        <p><strong>Имя:</strong> ${sanitize(username)}</p>
+        <p><strong>Пароль:</strong> ${sanitize(password)}</p>
+      </body>
+    </html>
+  `);
 });
 
-// Защита от XSS
 function sanitize(str) {
   return String(str).replace(/[&<>"']/g, (m) => ({
     '&': '&amp;',
@@ -41,5 +41,5 @@ function sanitize(str) {
 }
 
 app.listen(port, () => {
-  console.log(`Сервер работает на порту ${port}`);
+  console.log(`Сервер на порту ${port}`);
 });
